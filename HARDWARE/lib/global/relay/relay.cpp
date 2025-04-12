@@ -1,5 +1,4 @@
-#include <relay.h>
-int relayPin = P14;
+#include <global.h>
 void relayControl(AdafruitIO_Data *data) {
     String relayStatus = data->toString();
     Serial.print("Relay is ");  

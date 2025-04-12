@@ -1,11 +1,4 @@
-#include <sensor.h>
-DHT20 DHT(&Wire1);
-int sensorPin = P2_ADC;
-LiquidCrystal_I2C lcd(0x21, 16, 2);
-int status = DHT.read();
-float temperature = DHT.getTemperature();
-float humidity = DHT.getHumidity();
-float light = analogRead(sensorPin) * 100 / 4095;
+#include "global.h"
 void setupLCD(){
     lcd.init();
     lcd.backlight();
@@ -14,10 +7,10 @@ void setupLCD(){
 }
 
 void updateData() {
-    status = DHT.read();
-    temperature = DHT.getTemperature();
-    humidity = DHT.getHumidity();
-    light = analogRead(sensorPin);
+    // status = DHT.read();
+    temperature = random(10, 99);//DHT.getTemperature();
+    humidity = random(10, 99);//DHT.getHumidity();
+    light = random(10, 99);//analogRead(sensorPin);
 
     lcd.setCursor(0, 0);
     lcd.print("RT:");

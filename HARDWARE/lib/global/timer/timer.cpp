@@ -1,10 +1,7 @@
-#include <timer.h>
+#include <global.h>
 #include <stdint.h>
 int counter1 = 0;
 int counter2 = 0;
-int timer_flag1 = 0;
-int timer_flag2 = 0;
-Ticker myTimer;
 void setTimer1(int duration){
     counter1 = duration;
     timer_flag1 = 0;

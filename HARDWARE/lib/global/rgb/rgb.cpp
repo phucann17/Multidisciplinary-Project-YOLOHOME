@@ -1,11 +1,4 @@
-#include <rgb.h>
-int PIN_NEO_PIXEL = P0;
-int NUM_PIXELS  =   4;
-int pirPin = P16;
-bool check = false;
-unsigned long offTime = 0;
-String state;
-Adafruit_NeoPixel NeoPixel(NUM_PIXELS, PIN_NEO_PIXEL, NEO_GRB + NEO_KHZ800);
+#include <global.h>
 void rgbControl(AdafruitIO_Data *data) {
     String receivedData = data->toString();
     Serial.print("Received RGB Data: ");
@@ -74,11 +67,11 @@ void rgbAuto(AdafruitIO_Data *data){
     String autoStatus = data->toString();
     Serial.print("Auto is ");  
     Serial.println(autoStatus);
-    state = autoStatus;
+    stateRGB = autoStatus;
 }
 
 void autoLed(){
-    if (state == "1"){
+    if (stateRGB == "1"){
         light = analogRead(sensorPin) * 100 / 4095;
         if (digitalRead(pirPin) && light < 30){
             for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {

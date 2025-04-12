@@ -1,7 +1,4 @@
-#include "servoControl.h"
-Servo myservo;
-String password = "";
-int servoPin = P4;
+#include "global.h"
 void servoControl(AdafruitIO_Data *data){
     String servoStatus = data->toString();
     Serial.print("Servo is ");  
@@ -11,4 +8,11 @@ void servoControl(AdafruitIO_Data *data){
 void setupServo(int pin){
     myservo.attach(pin);
     myservo.write(180);
+}
+
+void servoAuto(AdafruitIO_Data *data){
+    String autoStatus = data->toString();
+    Serial.print("Auto Door is ");  
+    Serial.println(autoStatus);
+    stateDoor = autoStatus;
 }

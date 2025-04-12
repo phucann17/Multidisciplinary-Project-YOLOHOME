@@ -1,9 +1,5 @@
-#include <remote.hpp>
+#include <global.h>
 #include <IRremote.hpp>
-int receiverPin = P1;
-int speed = 0;
-String color = "";
-String passwordAda = "";
 void setupRemote(){
     IrReceiver.begin(receiverPin, ENABLE_LED_FEEDBACK);
 }

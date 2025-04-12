@@ -1,12 +1,4 @@
-#include <WiFi.h>
-#include "pins_arduino.h"
-#include <timer.h>
-#include <sensor.h>
-#include <remote.hpp>
-#include <string.h>
-#include <relay.h>
-#include <fan.h>
-#include <rgb.h>
+#include "global.h"
 //#include <IRremote.hpp>
 // Thông tin WiFi
 const char* WIFI_SSID = "";
@@ -15,8 +7,12 @@ const char* WIFI_PASS = "";
 // Thông tin Adafruit IO
 #define AIO_USERNAME    ""
 #define AIO_KEY         ""
+
+#define AIO_USERNAME1    ""
+#define AIO_KEY1         ""
 // Khởi tạo Adafruit IO
 AdafruitIO_WiFi io(AIO_USERNAME, AIO_KEY, WIFI_SSID, WIFI_PASS);
+AdafruitIO_WiFi io1(AIO_USERNAME1, AIO_KEY1, WIFI_SSID, WIFI_PASS);
 AdafruitIO_Feed *temperatureFeed = io.feed("DHT20_TEMPERATURE");
 AdafruitIO_Feed *humidityFeed = io.feed("DHT20_HUMIDITY");
 AdafruitIO_Feed *lightFeed = io.feed("LIGHT_SENSOR");
@@ -29,7 +25,8 @@ AdafruitIO_Feed *autorgb = io.feed("LED_RGB_AUTO");
 AdafruitIO_Feed *remoteFeedrgb = io.feed("LED_RGB");
 AdafruitIO_Feed *passwordFeed = io.feed("PASSWORD");
 AdafruitIO_Feed *timer_off = io.feed("TIME_OFF");
-
+AdafruitIO_Feed *autofan = io1.feed("AUTO_FAN");
+AdafruitIO_Feed *autodoor = io1.feed("AUTO_DOOR");
 void timerCallback() {
     timerRun();
 }
@@ -51,6 +48,7 @@ void sendData(){
 
 
 void feedSetup(){
+    io1.connect();
     io.connect();
     servoFeed->onMessage(servoControl);
     servoFeed->get();
@@ -66,6 +64,10 @@ void feedSetup(){
     passwordFeed->onMessage(passAuthorized);
     timer_off->get();
     timer_off->onMessage(timerControl);
+    autodoor->get();
+    autodoor->onMessage(servoAuto);
+    autofan->get();
+    autofan->onMessage(fanAuto);
 }
 
 
@@ -97,6 +99,7 @@ void setup() {
 
 void loop() {
     io.run();
+    io1.run();
     if (timer_flag1 == 1) {
         sendData();
         setTimer1(30);
