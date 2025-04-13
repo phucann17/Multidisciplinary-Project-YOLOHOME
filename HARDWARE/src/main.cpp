@@ -78,7 +78,7 @@ void setup() {
     pinMode(miniFanPin, OUTPUT);
     pinMode(pirPin, INPUT);
     Wire.begin();
-    Wire1.begin(P20, P19);
+    //Wire1.begin(P20, P19);
         //  ESP32 default pins 21 22
     setupRemote();
     Serial.println("IR Receiver Ready...");

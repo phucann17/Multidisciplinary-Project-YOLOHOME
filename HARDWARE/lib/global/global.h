@@ -66,6 +66,8 @@ extern float light;
 void setupLCD();
 void updateData();
 
-
-
+void fsm();
+extern int timeoutRGB;
+extern int timeoutDoor;
+extern int timeoutFan;
 

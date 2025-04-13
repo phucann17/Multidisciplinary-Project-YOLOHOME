@@ -24,7 +24,7 @@ int NUM_PIXELS  =   4;
 int pirPin = P16;
 bool check = false;
 unsigned long offTime = 0;
-String stateRGB;
+String stateRGB = "";
 Adafruit_NeoPixel NeoPixel(NUM_PIXELS, PIN_NEO_PIXEL, NEO_GRB + NEO_KHZ800);
 
 DHT20 DHT(&Wire1);
@@ -34,3 +34,7 @@ LiquidCrystal_I2C lcd(0x21, 16, 2);
 float temperature = random(10, 99);//DHT.getTemperature();
 float humidity = random(10, 99);//DHT.getHumidity();
 float light = random(10, 99);//analogRead(sensorPin) * 100 / 4095;
+
+int timeoutRGB = 1000;
+int timeoutDoor = 1000;
+int timeoutFan = 1000;
