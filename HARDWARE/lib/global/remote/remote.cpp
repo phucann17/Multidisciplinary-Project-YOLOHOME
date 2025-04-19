@@ -10,44 +10,111 @@ void controlRemote(){
         //Serial.println(receivedCode);
         switch (receivedCode){
             case 64:
-                speed += 20;
-                speed = speed > 100 ? 100 : speed;
-                analogWrite(miniFanPin, speed);
-                Serial.println("Fan_speed: ");
-                Serial.println(speed);
+                speedRemote += 20;
+                speedRemote = speedRemote > 100 ? 100 : speedRemote;
+                analogWrite(miniFanPin, speedRemote);
+                if (stateFan == 1){
+                    countFan = -1;
+                    stateFan = 0;
+                    autofan->save(0);
+                }
+                remoteFan->save(speedRemote);
                 break;
             case 25:
-                speed -= 20;
-                speed = speed < 0 ? 0 : speed;
-                analogWrite(miniFanPin, speed);
-                Serial.println("Fan_speed: ");
-                Serial.println(speed);
+                speedRemote -= 20;
+                speedRemote = speedRemote < 0 ? 0 : speedRemote;
+                analogWrite(miniFanPin, speedRemote);
+                if (stateFan == 1){
+                    countFan = -1;
+                    stateFan = 0;
+                    autofan->save(0);
+                }
+                remoteFan->save(speedRemote);
                 break;
             case 69:
-                for (int pixel = 0; pixel < NUM_PIXELS; pixel++) { //Black
-                    NeoPixel.setPixelColor(pixel, NeoPixel.Color(0, 0, 0));
+                colorRemote = "#000000";
+                remoteRGB->save(colorRemote);
+                turnoffLed();
+                if (stateRGB == 1){
+                    stateRGB = 0;
+                    countRGB = -1;
+                    autorgb->save(0);
                 }
-                color = "#000000";
-                NeoPixel.show();
+                prevcolorRemote = colorRemote;
                 break;
             case 71:
-                for (int pixel = 0; pixel < NUM_PIXELS; pixel++) { //White
-                    NeoPixel.setPixelColor(pixel, NeoPixel.Color(255, 255, 255));
+                if (prevcolorRemote == "" || prevcolorRemote == "#000000" || prevcolorRemote == "#800080"){
+                    colorRemote = "#ffffff";//white
+                    turnonLed(255, 255, 255);
+                    prevcolorRemote = colorRemote;
                 }
-                color = "#ffffff";
-                NeoPixel.show();
+                else if (prevcolorRemote == "#ffffff")
+                {
+                    colorRemote = "#ff0000";//red
+                    turnonLed(255, 0, 0);
+                    prevcolorRemote = colorRemote;
+                }
+                else if (prevcolorRemote == "#ff0000"){
+                    colorRemote = "#008000";//green
+                    turnonLed(0, 255, 0);
+                    prevcolorRemote = colorRemote;
+                }
+                else if (prevcolorRemote == "#008000"){
+                    colorRemote = "#0000ff";//blue
+                    turnonLed(0, 0, 255);
+                    prevcolorRemote = colorRemote;
+                }
+                else if (prevcolorRemote == "#0000ff"){
+                    colorRemote = "#ffff00";//yellow
+                    turnonLed(255, 255, 0);
+                    prevcolorRemote = colorRemote;
+                }
+                else if (prevcolorRemote == "#ffff00"){
+                    colorRemote = "#ffa500";//orange
+                    turnonLed(255, 165, 0);
+                    prevcolorRemote = colorRemote;
+                }
+                else if (prevcolorRemote == "#ffa500"){
+                    colorRemote = "#800080";//purple
+                    turnonLed(128, 0, 128);
+                    prevcolorRemote = colorRemote;
+                }
+                if (stateRGB == 1){
+                    stateRGB = 0;
+                    countRGB = -1;
+                    autorgb->save(0);
+                }
+                remoteRGB->save(colorRemote);
                 break;
             case 7:
                 digitalWrite(relayPin, LOW);
+                relayRemote = 0;
+                remoteRelay->save(relayRemote);
                 break;
             case 9:
                 digitalWrite(relayPin, HIGH);
+                relayRemote = 1;
+                remoteRelay->save(relayRemote);
                 break;
             case 68:
                 myservo.write(180);
+                if (stateDoor == 1){
+                    stateDoor = 0;
+                    countDoor = -1;
+                    autodoor->save(stateDoor);
+                }
+                doorRemote = 0;
+                remoteDoor->save(doorRemote);
                 break;
             case 67:
                 myservo.write(90);
+                doorRemote = 1;
+                remoteDoor->save(doorRemote);
+                if (stateDoor == 1){
+                    stateDoor = 0;
+                    countDoor = -1;
+                    autodoor->save(stateDoor);
+                }
                 break;
             case 12:
                 Serial.print("1");
@@ -91,14 +158,14 @@ void controlRemote(){
         if (password.length() == 6){
             if (password == passwordAda){
                 myservo.write(90);
+                servoFeed->save(1);
             }
             else{
                 myservo.write(180);
+                servoFeed->save(0);
             }
             password = "";
         }
-        //remoteFeedrgb->save(color);
-        //remoteFeedfan->save(speed);
         IrReceiver.resume();  // Tiếp tục nhận tín hiệu mới
     }
 }

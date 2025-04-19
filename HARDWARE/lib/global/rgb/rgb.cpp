@@ -1,97 +1,69 @@
 #include <global.h>
-void rgbControl(AdafruitIO_Data *data) {
+void rgbControl(AdafruitIO_Data *data)
+ {
     String receivedData = data->toString();
     Serial.print("Received RGB Data: ");
     Serial.println(receivedData);
 
     if (receivedData == "#000000"){
-        NeoPixel.clear();
-        NeoPixel.show();
+        turnoffLed();
     }
-    else if (receivedData == "#ff0000"){ //red
-        NeoPixel.clear();
-        for (int pixel = 0; pixel < NUM_PIXELS; pixel++) { //RED
-            NeoPixel.setPixelColor(pixel, NeoPixel.Color(255, 0, 0));
-            NeoPixel.show();
-        }
-        NeoPixel.show();
+    else if (receivedData == "#ff0000"){ //RED
+        turnonLed(255, 0, 0);
     }
     else if (receivedData == "#008000"){ // Green
-        NeoPixel.clear();
-        for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {
-            NeoPixel.setPixelColor(pixel, NeoPixel.Color(0, 255, 0));
-            NeoPixel.show();
-        }
-        NeoPixel.show();
+        turnonLed(0, 255, 0);
     }
     else if (receivedData == "#0000ff"){ //Blue
-        NeoPixel.clear();
-        for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {
-            NeoPixel.setPixelColor(pixel, NeoPixel.Color(0, 0, 255));
-            NeoPixel.show();
-        }
-        NeoPixel.show();
+        turnonLed(0, 0, 255);
     }
-    else if (receivedData == "#ffffff"){ //White (digitalRead(pirPin) == 1 && analogRead(sensorPin) > 65)  || 
-        NeoPixel.clear();
-        for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {
-            NeoPixel.setPixelColor(pixel, NeoPixel.Color(255, 255, 255));
-            NeoPixel.show();
-        }
-        NeoPixel.show();
+    else if (receivedData == "#ffffff"){ //White 
+        turnonLed(255, 255, 255);
     }
     else if (receivedData == "#ffff00") {  // Yelloư
-        NeoPixel.clear();
-        for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {
-            NeoPixel.setPixelColor(pixel, NeoPixel.Color(255, 255, 0));
-        }
-        NeoPixel.show();
+        turnonLed(255, 255, 0);
     }
     else if (receivedData == "#ffa500") {  // Orange
-        NeoPixel.clear();
-        for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {
-            NeoPixel.setPixelColor(pixel, NeoPixel.Color(255, 165, 0));
-        }
-        NeoPixel.show();
+        turnonLed(255, 165, 0);
     }
     else if (receivedData == "#800080") {  // purple
-        NeoPixel.clear();
-        for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {
-            NeoPixel.setPixelColor(pixel, NeoPixel.Color(128, 0, 128)); // Tím = (128, 0, 128)
-        }
-        NeoPixel.show();
-    }  
+        turnonLed(128, 0, 128);
+    }
+    if (stateRGB == 1){
+        stateRGB = 0;
+        //autorgb->save(stateRGB);
+        countRGB = timeoutRGB;   
+    }
 }
 
 void rgbAuto(AdafruitIO_Data *data){
     String autoStatus = data->toString();
-    Serial.print("Auto is ");  
-    Serial.println(autoStatus);
-    stateRGB = autoStatus;
+    Serial.print("Auto is ");
+    Serial.print(autoStatus);  
+    if (autoStatus.toInt() == 0){
+        countRGB = -1;
+    }
+    stateRGB = autoStatus.toInt();
 }
 
 void autoLed(){
-    if (stateRGB == "1"){
-        light = analogRead(sensorPin) * 100 / 4095;
-        if (digitalRead(pirPin) && light < 30){
-            for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {
-                NeoPixel.setPixelColor(pixel, NeoPixel.Color(255, 255, 255));
-            }
-            NeoPixel.show();
+        if (digitalRead(pirPin) && (light * 100 / 4095) < 30){
+            turnonLed(255, 255, 255);
+            setTimerRGB(10);
         }
         else{
-            NeoPixel.clear();
-            NeoPixel.show();
+            if (timer_flag5 == 1){
+                turnoffLed();
+                timer_flag5 = 0;
+            }
         }
-    }
-    else;
 }
 
 void timerControl(AdafruitIO_Data *data) {
     String timeStr = data->toString();
     Serial.print("Received timer off: ");
     Serial.println(timeStr);
-    if (timeStr != NULL && timeStr != "00:00"){
+    if (timeStr != "null" && timeStr != "00:00"){
         check = 1;
         int hour = timeStr.substring(0, timeStr.indexOf(':')).toInt();
         int minute = timeStr.substring(timeStr.indexOf(':') + 1).toInt();
@@ -108,4 +80,11 @@ void turnoffLed(){
     NeoPixel.show();
     //Serial.println("OFF");
     //Serial.println("OFF");
+}
+
+void turnonLed(int r, int g, int b){
+    for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {
+        NeoPixel.setPixelColor(pixel, NeoPixel.Color(r, g, b));
+    }
+    NeoPixel.show();
 }

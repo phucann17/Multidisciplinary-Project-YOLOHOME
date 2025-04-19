@@ -7,10 +7,10 @@ void setupLCD(){
 }
 
 void updateData() {
-    // status = DHT.read();
-    temperature = random(10, 99);//DHT.getTemperature();
-    humidity = random(10, 99);//DHT.getHumidity();
-    light = random(10, 99);//analogRead(sensorPin);
+    status = DHT.read();
+    temperature = DHT.getTemperature();
+    humidity = DHT.getHumidity();
+    light = analogRead(sensorPin);
 
     lcd.setCursor(0, 0);
     lcd.print("RT:");
@@ -26,7 +26,7 @@ void updateData() {
     lcd.setCursor(0, 1);
     lcd.print("LUX:");
     lcd.setCursor(4, 1);
-    lcd.print(light);
+    lcd.print(light * 100 / 4095);
     lcd.print("%");
 }
  

@@ -1,34 +1,10 @@
 #include "global.h"
 //#include <IRremote.hpp>
-// Thông tin WiFi
-const char* WIFI_SSID = "";
-const char* WIFI_PASS = "";
 
-// Thông tin Adafruit IO
-#define AIO_USERNAME    ""
-#define AIO_KEY         ""
 
-#define AIO_USERNAME1    ""
-#define AIO_KEY1         ""
-// Khởi tạo Adafruit IO
-AdafruitIO_WiFi io(AIO_USERNAME, AIO_KEY, WIFI_SSID, WIFI_PASS);
-AdafruitIO_WiFi io1(AIO_USERNAME1, AIO_KEY1, WIFI_SSID, WIFI_PASS);
-AdafruitIO_Feed *temperatureFeed = io.feed("DHT20_TEMPERATURE");
-AdafruitIO_Feed *humidityFeed = io.feed("DHT20_HUMIDITY");
-AdafruitIO_Feed *lightFeed = io.feed("LIGHT_SENSOR");
-AdafruitIO_Feed *relayFeed = io.feed("RELAY");
-AdafruitIO_Feed *servoFeed = io.feed("SERVO_DOOR");
-AdafruitIO_Feed *rgbFeed = io.feed("LED_RGB");
-AdafruitIO_Feed *fanFeed = io.feed("MINI_FAN");
-AdafruitIO_Feed *remoteFeedfan = io.feed("MINI_FAN");
-AdafruitIO_Feed *autorgb = io.feed("LED_RGB_AUTO");
-AdafruitIO_Feed *remoteFeedrgb = io.feed("LED_RGB");
-AdafruitIO_Feed *passwordFeed = io.feed("PASSWORD");
-AdafruitIO_Feed *timer_off = io.feed("TIME_OFF");
-AdafruitIO_Feed *autofan = io1.feed("AUTO_FAN");
-AdafruitIO_Feed *autodoor = io1.feed("AUTO_DOOR");
 void timerCallback() {
     timerRun();
+    SCH_Update();
 }
 
 void sendData(){
@@ -78,7 +54,7 @@ void setup() {
     pinMode(miniFanPin, OUTPUT);
     pinMode(pirPin, INPUT);
     Wire.begin();
-    //Wire1.begin(P20, P19);
+    Wire1.begin(P20, P19);
         //  ESP32 default pins 21 22
     setupRemote();
     Serial.println("IR Receiver Ready...");
@@ -91,9 +67,11 @@ void setup() {
     NeoPixel.begin();
 
     sendData();
+    SCH_Init();
+    //SCH_Add_Task(fsm_auto, 0, 1);
+    SCH_Add_Task(fsm_manual, 0, 10);
     myTimer.attach(1.0, timerCallback);
-    // setTimer(1, false, &dataTimer1, 6000, timerRun2);
-    setTimer1(30);
+    setTimer1(3);
 }
 
 
@@ -106,10 +84,13 @@ void loop() {
     }
     if (timer_flag2 == 1) {
         turnoffLed();
+        rgbFeed->save("#000000");
         timer_flag2 = 0;
     }
-
-    autoLed();
+    //fsm();
+    fsm_auto();
+    //fsm_manual();
+    SCH_Dispatch_Tasks();
     controlRemote();
     //Serial.println(digitalRead(pirPin));
 }
